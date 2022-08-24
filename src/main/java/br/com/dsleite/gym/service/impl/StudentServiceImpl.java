@@ -1,10 +1,12 @@
 package br.com.dsleite.gym.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.dsleite.gym.entity.PhysicalEvaluation;
 import br.com.dsleite.gym.entity.Student;
 import br.com.dsleite.gym.entity.form.StudentForm;
 import br.com.dsleite.gym.entity.form.StudentFormUpdate;
@@ -50,5 +52,13 @@ public class StudentServiceImpl implements IStudentService {
     @Override
     public void delete(Long id){
         
+    }
+
+    public List<PhysicalEvaluation> getStudentEvaluations(Long id) {
+        Optional<Student> student = this.repository.findById(id);
+        if(student.isPresent()){
+            return student.get().getEvaluations();
+        }
+        return null;
     }
 }
