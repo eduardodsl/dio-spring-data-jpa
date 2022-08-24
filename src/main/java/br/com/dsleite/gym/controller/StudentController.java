@@ -2,12 +2,15 @@ package br.com.dsleite.gym.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.dsleite.gym.entity.PhysicalEvaluation;
@@ -23,12 +26,12 @@ public class StudentController {
     private StudentServiceImpl service;
 
     @GetMapping("all")
-    public List<Student> getAll() {
-        return this.service.getAll();
+    public List<Student> getAll(@RequestParam(value = "birth_date", required = false) String birthDate) {
+        return this.service.getAll(birthDate);
     }
 
     @PostMapping("create")
-    public Student create(@RequestBody StudentForm form){
+    public Student create(@Valid @RequestBody StudentForm form){
         return service.create(form);
     }
     

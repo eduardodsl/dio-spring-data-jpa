@@ -1,5 +1,6 @@
 package br.com.dsleite.gym.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,8 +41,12 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
-    public List<Student> getAll(){
-        return this.repository.findAll();
+    public List<Student> getAll(String birthDate){
+        if(birthDate == null){
+            return this.repository.findAll();
+        }
+        LocalDate bDate = LocalDate.parse(birthDate);
+        return this.repository.findByBirthDate(bDate);
     }
 
     @Override

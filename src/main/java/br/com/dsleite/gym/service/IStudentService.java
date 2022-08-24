@@ -10,7 +10,7 @@ import br.com.dsleite.gym.entity.form.StudentFormUpdate;
 public interface IStudentService {
     public Student create(StudentForm form);
     public Student get(Long id);
-    public List<Student> getAll();
+    public List<Student> getAll(String birthDate);
     public Student update(Long id, StudentFormUpdate formUpdate);
     public void delete(Long id);
     public List<PhysicalEvaluation> getStudentEvaluations(Long id);
