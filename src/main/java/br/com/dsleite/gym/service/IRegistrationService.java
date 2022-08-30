@@ -2,14 +2,16 @@ package br.com.dsleite.gym.service;
 
 import java.util.List;
 
-import br.com.dsleite.gym.entity.Registration;
+import br.com.dsleite.gym.dto.RegistrationDTO;
 import br.com.dsleite.gym.entity.form.RegistrationForm;
 import br.com.dsleite.gym.entity.form.RegistrationFormUpdate;
+import br.com.dsleite.gym.exception.RegistrationNotFoundException;
+import br.com.dsleite.gym.exception.StudentNotFoundException;
 
 public interface IRegistrationService {
-    public Registration create(RegistrationForm form);
-    public Registration get(Long id);
-    public List<Registration> getAll(String studentDistrict);
-    public Registration update(Long id, RegistrationFormUpdate formUpdate);
-    public void delete(Long id);
+    public RegistrationDTO create(RegistrationForm form) throws StudentNotFoundException;
+    public RegistrationDTO get(Long id) throws RegistrationNotFoundException;
+    public List<RegistrationDTO> getAll(String studentDistrict);
+    public RegistrationDTO update(Long id, RegistrationFormUpdate formUpdate) throws RegistrationNotFoundException;
+    public RegistrationDTO delete(Long id) throws RegistrationNotFoundException;
 }

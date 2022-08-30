@@ -2,29 +2,34 @@ package br.com.dsleite.gym.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.dsleite.gym.dto.PhysicalEvaluationDTO;
 import br.com.dsleite.gym.entity.PhysicalEvaluation;
 import br.com.dsleite.gym.entity.Student;
 import br.com.dsleite.gym.entity.form.PhysicalEvaluationForm;
 import br.com.dsleite.gym.entity.form.PhysicalEvaluationFormUpdate;
+import br.com.dsleite.gym.exception.PhysicalEvaluationNotFoundException;
+import br.com.dsleite.gym.exception.StudentNotFoundException;
+import br.com.dsleite.gym.mapper.PhysicalEvaluationMapper;
 import br.com.dsleite.gym.repository.PhysicalEvaluationRepository;
 import br.com.dsleite.gym.repository.StudentRepository;
 import br.com.dsleite.gym.service.IPhysicalEvaluationService;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class PhysicalEvaluationServiceImpl implements IPhysicalEvaluationService {
     
-    @Autowired
-    private PhysicalEvaluationRepository repository;
-
-    @Autowired
-    private StudentRepository studentRepo;
+    private final PhysicalEvaluationRepository repository;
+    private final PhysicalEvaluationMapper evaluationMapper = PhysicalEvaluationMapper.INSTANCE;
+    private final StudentRepository studentRepo;
 
     @Override
-    public PhysicalEvaluation create(PhysicalEvaluationForm form){
+    public PhysicalEvaluationDTO create(PhysicalEvaluationForm form) throws StudentNotFoundException {
         
         PhysicalEvaluation physicalEvaluation = new PhysicalEvaluation();
         Optional<Student> student = studentRepo.findById(form.getStudentId());
@@ -33,29 +38,55 @@ public class PhysicalEvaluationServiceImpl implements IPhysicalEvaluationService
             physicalEvaluation.setStudent(student.get());
             physicalEvaluation.setCurrentHeight(form.getCurrentHeight());
             physicalEvaluation.setCurrentWeight(form.getCurrentWeight());
-            return this.repository.save(physicalEvaluation);
+            PhysicalEvaluationDTO dto = evaluationMapper.toDTO(this.repository.save(physicalEvaluation));
+            return dto;
         }
 
-        return new PhysicalEvaluation();
+        throw new StudentNotFoundException(form.getStudentId());
     }
 
     @Override
-    public PhysicalEvaluation get(Long id){
-        return null;
+    public PhysicalEvaluationDTO get(Long id) throws PhysicalEvaluationNotFoundException {
+        Optional<PhysicalEvaluation> evaluation = this.repository.findById(id);
+        if(evaluation.isPresent()){
+            PhysicalEvaluationDTO dto = this.evaluationMapper.toDTO(evaluation.get());
+            return dto;
+        }
+        throw new PhysicalEvaluationNotFoundException(id);
     }
 
     @Override
-    public List<PhysicalEvaluation> getAll(){
-        return this.repository.findAll();
+    public List<PhysicalEvaluationDTO> getAll(){
+        return this.repository
+            .findAll()
+            .stream()
+            .map(evaluationMapper::toDTO)
+            .collect(Collectors.toList());
     }
 
     @Override
-    public PhysicalEvaluation update(Long id, PhysicalEvaluationFormUpdate formUpdate){
-        return null;
-    }
-
-    @Override
-    public void delete(Long id){
+    public PhysicalEvaluationDTO update(Long id, PhysicalEvaluationFormUpdate form) throws PhysicalEvaluationNotFoundException {
         
+        Optional<PhysicalEvaluation> physicalEvaluation = this.repository.findById(id);
+        if(physicalEvaluation.isPresent()){
+            PhysicalEvaluation physicalEvaluationToUpdate = physicalEvaluation.get();
+            physicalEvaluationToUpdate.setCurrentHeight(form.getCurrentHeight());
+            physicalEvaluationToUpdate.setCurrentWeight(form.getCurrentWeight());
+            PhysicalEvaluation result = this.repository.save(physicalEvaluation.get());
+            return this.evaluationMapper.toDTO(result);
+        }
+        throw new PhysicalEvaluationNotFoundException(id);
+
     }
+
+    @Override
+    public PhysicalEvaluationDTO delete(Long id) throws PhysicalEvaluationNotFoundException{
+        Optional<PhysicalEvaluation> physicalEvaluation = this.repository.findById(id);
+        if(physicalEvaluation.isPresent()){
+            this.repository.delete(physicalEvaluation.get());
+            return this.evaluationMapper.toDTO(physicalEvaluation.get());
+        }
+        throw new PhysicalEvaluationNotFoundException(id);
+    }
+
 }

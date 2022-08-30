@@ -2,7 +2,8 @@ package br.com.dsleite.gym.entity.form;
 
 import java.time.LocalDateTime;
 
-import br.com.dsleite.gym.entity.Student;
+import javax.validation.constraints.Past;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,8 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RegistrationFormUpdate {
     
-    private Long id;
-    private Student student;
+    @Past(message = "'${validatedValue}' is an invalid date")
     private LocalDateTime registrationDate;
     
 }
